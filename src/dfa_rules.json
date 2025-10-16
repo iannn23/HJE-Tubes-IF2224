@@ -11,7 +11,13 @@
         "S_LPAREN": "LPARENTHESIS",
         "S_RPAREN": "RPARENTHESIS",
         "S_DOT": "DOT",
-        "S_STRING_END": "STRING_LITERAL"
+        "S_STRING_END": "STRING_LITERAL",
+        "S_GT": "RELATIONAL_OPERATOR",
+        "S_LT": "RELATIONAL_OPERATOR",
+        "S_EQ": "RELATIONAL_OPERATOR",
+        "S_MINUS": "ARITHMETIC_OPERATOR",
+        "S_MULT": "ARITHMETIC_OPERATOR",
+        "S_DIV": "ARITHMETIC_OPERATOR"
     },
     "transitions": {
         "S0": {
@@ -24,7 +30,13 @@
             "(": "S_LPAREN",
             ")": "S_RPAREN",
             ".": "S_DOT",
-            "'": "S_STRING"
+            "'": "S_STRING",
+            ">": "S_GT",
+            "<": "S_LT",
+            "=": "S_EQ",
+            "-": "S_MINUS",
+            "*": "S_MULT",
+            "/": "S_DIV"
         },
         "S_ID": {
             "letter": "S_ID",
@@ -48,8 +60,26 @@
             "digit": "S_STRING",
             " ": "S_STRING",
             "=": "S_STRING",
+            "+": "S_STRING",
+            "-": "S_STRING",
+            "*": "S_STRING",
+            "/": "S_STRING",
+            "(": "S_STRING",
+            ")": "S_STRING",
+            ",": "S_STRING",
+            ".": "S_STRING",
+            ":": "S_STRING",
+            ";": "S_STRING",
+            ">": "S_STRING",
+            "<": "S_STRING",
             "'": "S_STRING_END"
         },
-        "S_STRING_END": {}
+        "S_STRING_END": {},
+        "S_GT": {},
+        "S_LT": {},
+        "S_EQ": {},
+        "S_MINUS": {},
+        "S_MULT": {},
+        "S_DIV": {}
     }
 }
