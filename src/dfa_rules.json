@@ -17,7 +17,9 @@
         "S_EQ": "RELATIONAL_OPERATOR",
         "S_MINUS": "ARITHMETIC_OPERATOR",
         "S_MULT": "ARITHMETIC_OPERATOR",
-        "S_DIV": "ARITHMETIC_OPERATOR"
+        "S_DIV": "ARITHMETIC_OPERATOR",
+        "S_LBRACKET": "LBRACKET",
+        "S_RBRACKET": "RBRACKET"
     },
     "transitions": {
         "S0": {
@@ -36,7 +38,9 @@
             "=": "S_EQ",
             "-": "S_MINUS",
             "*": "S_MULT",
-            "/": "S_DIV"
+            "/": "S_DIV",
+            "[": "S_LBRACKET",
+            "]": "S_RBRACKET"
         },
         "S_ID": {
             "letter": "S_ID",
@@ -72,6 +76,8 @@
             ";": "S_STRING",
             ">": "S_STRING",
             "<": "S_STRING",
+            "[": "S_STRING",
+            "]": "S_STRING",
             "'": "S_STRING_END"
         },
         "S_STRING_END": {},
@@ -80,6 +86,8 @@
         "S_EQ": {},
         "S_MINUS": {},
         "S_MULT": {},
-        "S_DIV": {}
+        "S_DIV": {},
+        "S_LBRACKET": {},
+        "S_RBRACKET": {}
     }
 }

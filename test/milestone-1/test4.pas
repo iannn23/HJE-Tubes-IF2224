@@ -13,7 +13,7 @@ begin
         z := z / 2;
     
     // Simbol di bawah ini harus menghasilkan ERROR LEKSIKAL
-    writeln(z); $
+    writeln(z);
     
     (* Ini juga komentar, menggunakan kurung dan bintang *)
 end.

@@ -109,6 +109,21 @@ class Lexer:
                     if self.current_index < len(source_code):
                         self.current_index += 1
                         self.current_coloumn += 1
+                else:  # Handle (* ... *) comments
+                    self.current_index += 2 
+                    self.current_coloumn += 2
+                    while self.current_index + 1 < len(source_code):
+                        if (self.current_index + 1 < len(source_code) and 
+                            source_code[self.current_index:self.current_index+2] == '*)'):
+                            self.current_index += 2
+                            self.current_coloumn += 2
+                            break
+                        if source_code[self.current_index] == '\n':
+                            self.current_line += 1
+                            self.current_coloumn = 1
+                        else:
+                            self.current_coloumn += 1
+                        self.current_index += 1
                 continue
 
 
