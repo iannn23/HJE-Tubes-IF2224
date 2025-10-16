@@ -1,6 +1,6 @@
 # HJE-Tubes-IF2224 | Pascal-S Lexical Analyzer (Milestone 1)
 
-![Foto Header](doc/image.jpg)
+![Foto Header](doc/image.png)
 
 ## Identitas Kelompok
 
