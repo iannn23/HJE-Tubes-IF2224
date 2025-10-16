@@ -1,6 +1,9 @@
 # HJE-Tubes-IF2224 | Pascal-S Lexical Analyzer (Milestone 1)
 
+![Foto Header](doc/image.jpg)
+
 ## Identitas Kelompok
+
 ```
 - Sebastian Enrico Nathanael (13523134)
 - Jonathan Kenan Budianto (13523139)
@@ -9,7 +12,6 @@
 ```
 
 ## Deskripsi Program
-
 
 ## Cara Instalasi dan Penggunaan Program
 
