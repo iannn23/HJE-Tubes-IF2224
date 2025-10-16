@@ -110,7 +110,7 @@ class Lexer:
                         self.current_index += 1
                         self.current_coloumn += 1
                 else:  # Handle (* ... *) comments
-                    self.current_index += 2 
+                    self.current_index += 2 #skip (*
                     self.current_coloumn += 2
                     while self.current_index + 1 < len(source_code):
                         if (self.current_index + 1 < len(source_code) and 
