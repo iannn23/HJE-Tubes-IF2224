@@ -1,6 +1,5 @@
 program TestAllTokens; {1, 2, 10}
 
-//testing untuk semua token
 const
     PiValue = 3.14; {1, 2, 7, 10}
 
@@ -19,7 +18,7 @@ begin
     ch := 'A'; {2, 6, 8, 10} 
 
     if (sum <> 0) and (count > 0) then {1, 14, 2, 4, 7, 15, 5, 14, 2, 4, 7, 15, 1}
-        flag := TRUE  // TRUE bukan keyword di Pascal-S, tapi kita asumsikan untuk boolean
+        flag := TRUE 
     else 
         flag := FALSE;
         

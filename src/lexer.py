@@ -56,7 +56,7 @@ class Lexer:
             
         if token_type == "STRING_LITERAL":
             # Jika panjangnya 3 (contoh: 'a'), itu adalah CHAR_LITERAL
-            if len(lexeme) == 3:
+            if len(lexeme) == 3 or len(lexeme) == 2:
                 return "CHAR_LITERAL"
             else:
                 return "STRING_LITERAL"
@@ -133,7 +133,6 @@ class Lexer:
                         self.current_index += 1
                 continue
 
-
             #Scanning Token 
             current_state = self.dfa['start_state']
             lexeme =""
@@ -178,10 +177,3 @@ class Lexer:
                 self.current_coloumn += 1
         
         return tokens
-
-
-        
-            
-
-
-

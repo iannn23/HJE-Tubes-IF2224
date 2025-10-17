@@ -12,7 +12,6 @@ begin
     if z >= 0 then
         z := z / 2;
     
-    // Simbol di bawah ini harus menghasilkan ERROR LEKSIKAL
     writeln(z); $
     
     (* Ini juga komentar, menggunakan kurung dan bintang *)
