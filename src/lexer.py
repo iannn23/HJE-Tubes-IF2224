@@ -49,7 +49,11 @@ class Lexer:
         lexeme_lower = lexeme.lower()
 
         if token_type == "IDENTIFIER_CANDIDATE":
-            if lexeme_lower in [k.lower() for k in self.keywords]:
+            if lexeme_lower in ["and", "or", "not"]:
+                return "LOGICAL_OPERATOR"
+            elif lexeme_lower in ["div", "mod"]:
+                return "ARITHMETIC_OPERATOR"
+            elif lexeme_lower in [k.lower() for k in self.keywords]:
                 return "KEYWORD"
             else:
                 return "IDENTIFIER"
