@@ -4,6 +4,7 @@
         "S_ID": "IDENTIFIER_CANDIDATE",
         "S_SEMI": "SEMICOLON",
         "S_NUM": "NUMBER",
+        "S_REAL": "NUMBER",
         "S_PLUS": "ARITHMETIC_OPERATOR",
         "S_COMMA": "COMMA",
         "S_COLON": "COLON",
@@ -11,9 +12,13 @@
         "S_LPAREN": "LPARENTHESIS",
         "S_RPAREN": "RPARENTHESIS",
         "S_DOT": "DOT",
+        "S_RANGE": "RANGE_OPERATOR",
         "S_STRING_END": "STRING_LITERAL",
         "S_GT": "RELATIONAL_OPERATOR",
+        "S_GTE": "RELATIONAL_OPERATOR",
         "S_LT": "RELATIONAL_OPERATOR",
+        "S_LTE": "RELATIONAL_OPERATOR",
+        "S_NEQ": "RELATIONAL_OPERATOR",
         "S_EQ": "RELATIONAL_OPERATOR",
         "S_MINUS": "ARITHMETIC_OPERATOR",
         "S_MULT": "ARITHMETIC_OPERATOR",
@@ -48,7 +53,14 @@
         },
         "S_SEMI": {},
         "S_NUM": {
-            "digit": "S_NUM"
+            "digit": "S_NUM",
+            ".": "S_REAL_DOT"
+        },
+        "S_REAL_DOT": {
+            "digit": "S_REAL"
+        },
+        "S_REAL": {
+            "digit": "S_REAL"
         },
         "S_PLUS": {},
         "S_COMMA": {},
@@ -58,7 +70,10 @@
         "S_ASSIGN": {},
         "S_LPAREN": {},
         "S_RPAREN": {},
-        "S_DOT": {},
+        "S_DOT": {
+            ".": "S_RANGE"
+        },
+        "S_RANGE": {},
         "S_STRING": {
             "letter": "S_STRING",
             "digit": "S_STRING",
@@ -81,8 +96,16 @@
             "'": "S_STRING_END"
         },
         "S_STRING_END": {},
-        "S_GT": {},
-        "S_LT": {},
+        "S_GT": {
+            "=": "S_GTE"
+        },
+        "S_GTE": {},
+        "S_LT": {
+            "=": "S_LTE",
+            ">": "S_NEQ"
+        },
+        "S_LTE": {},
+        "S_NEQ": {},
         "S_EQ": {},
         "S_MINUS": {},
         "S_MULT": {},

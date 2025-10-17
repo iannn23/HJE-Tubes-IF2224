@@ -54,6 +54,13 @@ class Lexer:
             else:
                 return "IDENTIFIER"
             
+        if token_type == "STRING_LITERAL":
+            # Jika panjangnya 3 (contoh: 'a'), itu adalah CHAR_LITERAL
+            if len(lexeme) == 3:
+                return "CHAR_LITERAL"
+            else:
+                return "STRING_LITERAL"
+            
         return token_type if token_type else "UNKNOWN_TOKEN"
 
     def advance_past_comment(self, source_code, index):
