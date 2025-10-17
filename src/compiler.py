@@ -8,10 +8,7 @@ PASCAL_S_KEYWORDS = [
     # Keyword
     "program", "var", "begin", "end", "if", "then", "else", "while", "do", 
     "for", "to", "downto", "integer", "real", "boolean", "char", "array", 
-    "of", "procedure", "function", "const", "type",
-    
-    # Keyword Operator
-    "div", "mod", "and", "or", "not"
+    "of", "procedure", "function", "const", "type", "true", "false"
 ]
 
 def main():
