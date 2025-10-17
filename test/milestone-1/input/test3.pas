@@ -6,7 +6,6 @@ const
 var
     A: array [SIZE] of char;
     flag: boolean;
-    01..00
     
 begin
     flag := TRUE and NOT FALSE; (* Logika dan assignment *)
