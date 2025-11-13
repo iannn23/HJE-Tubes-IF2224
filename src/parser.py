@@ -460,16 +460,16 @@ class Parser:
     
     # Control Flow Statements
     def if_statement(self):
-        # Grammar: jika <expression> maka <statement> [selain-itu <statement>]
+        # Grammar: jika <expression> maka <statement> [selain_itu <statement>]
         node = Node("<if-statement>")
         node.add_child(self.expect("KEYWORD", "jika"))
         node.add_child(self.expression())
         node.add_child(self.expect("KEYWORD", "maka"))
         node.add_child(self.statement())
         
-        # Cek apakah ada 'selain-itu' (else)
-        if self.peek("KEYWORD", "selain-itu"):
-            node.add_child(self.expect("KEYWORD", "selain-itu"))
+        # Cek apakah ada 'selain_itu' (else)
+        if self.peek("KEYWORD", "selain_itu"):
+            node.add_child(self.expect("KEYWORD", "selain_itu"))
             node.add_child(self.statement())
             
         return node
@@ -484,7 +484,7 @@ class Parser:
         return node
 
     def for_statement(self):
-        # Grammar: untuk <id> := <expr> ke/turun-ke <expr> lakukan <statement>
+        # Grammar: untuk <id> := <expr> ke/turun_ke <expr> lakukan <statement>
         node = Node("<for-statement>")
         node.add_child(self.expect("KEYWORD", "untuk"))
         node.add_child(self.expect("IDENTIFIER"))
@@ -494,10 +494,10 @@ class Parser:
         # Cek arah loop
         if self.peek("KEYWORD", "ke"):
             node.add_child(self.expect("KEYWORD", "ke"))
-        elif self.peek("KEYWORD", "turun-ke"):
-            node.add_child(self.expect("KEYWORD", "turun-ke"))
+        elif self.peek("KEYWORD", "turun_ke"):
+            node.add_child(self.expect("KEYWORD", "turun_ke"))
         else:
-            raise SyntaxError("Error Sintaks: Diharapkan 'ke' atau 'turun-ke' dalam loop 'untuk'.")
+            raise SyntaxError("Error Sintaks: Diharapkan 'ke' atau 'turun_ke' dalam loop 'untuk'.")
             
         node.add_child(self.expression())
         node.add_child(self.expect("KEYWORD", "lakukan"))

@@ -11,8 +11,8 @@ PASCAL_S_KEYWORDS = [
     "for", "to", "downto", "integer", "real", "boolean", "char", "array", 
     "of", "procedure", "function", "const", "type", "true", "false",
     # Padanan Bahasa Indonesia
-    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain-itu", "selama", "lakukan",
-    "untuk", "ke", "turun-ke", "integer", "real", "boolean", "char", "larik",
+    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain_itu", "selama", "lakukan",
+    "untuk", "ke", "turun_ke", "integer", "real", "boolean", "char", "larik",
     "dari", "prosedur", "fungsi", "konstanta", "tipe", "true", "false"
 ]
 
@@ -77,7 +77,22 @@ def main():
             
             if parse_tree:
                 print("\nParse Tree berhasil dibuat:")
-                parse_tree.print_tree()
+                parse_tree.print_tree() # Tetap tampilkan di console
+
+                try:
+
+                    parsetree_filename = f"parsetree-{test_number}.txt"
+                    parsetree_output_path = os.path.join(output_dir, parsetree_filename)
+                    
+                    tree_string = str(parse_tree) 
+                    
+                    with open(parsetree_output_path, 'w', encoding='utf-8') as f:
+                        f.write(tree_string)
+                    print(f"Parse tree berhasil ditulis ke: {parsetree_output_path}")
+                
+                except Exception as e:
+                    print(f"Gagal menulis file parse tree: {e}")
+
             else:
                 print("Tidak ada output dari parser.")
 
