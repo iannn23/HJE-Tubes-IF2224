@@ -11,7 +11,7 @@ PASCAL_S_KEYWORDS = [
     "for", "to", "downto", "integer", "real", "boolean", "char", "array", 
     "of", "procedure", "function", "const", "type", "true", "false",
     # Padanan Bahasa Indonesia
-    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain-itu", "selama", "kerjakan",
+    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain-itu", "selama", "lakukan",
     "untuk", "ke", "turun-ke", "integer", "real", "boolean", "char", "larik",
     "dari", "prosedur", "fungsi", "konstanta", "tipe", "true", "false"
 ]

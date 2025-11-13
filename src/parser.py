@@ -289,10 +289,16 @@ class Parser:
                 
             # 5. Cek Identifier (Bisa Assignment ATAU Procedure Call)
             elif self.peek("IDENTIFIER"):
-                # Intip token setelah identifier untuk membedakan
                 next_token_idx = self.token_index + 1
-                if next_token_idx < len(self.tokens) and \
-                self.tokens[next_token_idx].type == "ASSIGN_OPERATOR":
+                
+                is_assignment = False
+                if next_token_idx < len(self.tokens):
+                    next_type = self.tokens[next_token_idx].type
+                    # Assignment ditandai dengan ':=' ATAU '[' (untuk array)
+                    if next_type == "ASSIGN_OPERATOR" or next_type == "LBRACKET":
+                        is_assignment = True
+                
+                if is_assignment:
                     return self.assignment_statement()
                 else:
                     return self.procedure_call()
@@ -305,10 +311,24 @@ class Parser:
                 raise SyntaxError(f"Error Sintaks: Diharapkan statement, ditemukan '{self.current_token.value}'")
 
     def assignment_statement(self):
+        # Grammar: ID [ '[' expression ']' ] := expression
         node = Node("<assignment-statement>")
+        
+        # 1. Nama Variabel
         node.add_child(self.expect("IDENTIFIER"))
+        
+        # 2. Cek apakah ini akses Array? (Opsional)
+        if self.peek("LBRACKET", "["):
+             node.add_child(self.expect("LBRACKET", "["))
+             node.add_child(self.expression()) # Indeks
+             node.add_child(self.expect("RBRACKET", "]"))
+        
+        # 3. Operator Assignment
         node.add_child(self.expect("ASSIGN_OPERATOR", ":="))
+        
+        # 4. Nilai Baru
         node.add_child(self.expression())
+        
         return node
 
     # ATURAN PRODUKSI EKSPRESI
@@ -385,15 +405,26 @@ class Parser:
 
     def factor(self):
         """
-        Aturan produksi: <factor> -> IDENTIFIER | NUMBER | ( <expression> )
+        Aturan produksi: <factor> -> IDENTIFIER | NUMBER | STRING | CHAR | ( <expression> ) | true | false
         """
         node = Node("<factor>")
         
         if self.peek("IDENTIFIER"):
             # Cek apakah ini Function Call (ID diikuti kurung buka)
             next_token_idx = self.token_index + 1
+            
+            # Kasus 1: Function Call -> nama_fungsi(...)
             if next_token_idx < len(self.tokens) and self.tokens[next_token_idx].type == "LPARENTHESIS":
                  node.add_child(self.function_call())
+
+            # Kasus 2: Array Access -> nama_array[indeks] 
+            elif next_token_idx < len(self.tokens) and self.tokens[next_token_idx].type == "LBRACKET":
+                 node.add_child(self.expect("IDENTIFIER"))
+                 node.add_child(self.expect("LBRACKET", "["))
+                 node.add_child(self.expression()) # Indeks array
+                 node.add_child(self.expect("RBRACKET", "]"))
+
+            # Kasus 3: Variabel Biasa
             else:
                  node.add_child(self.expect("IDENTIFIER"))
                  
@@ -405,6 +436,12 @@ class Parser:
             
         elif self.peek("CHAR_LITERAL"):
             node.add_child(self.expect("CHAR_LITERAL"))
+
+        elif self.peek("KEYWORD", "true"):
+            node.add_child(self.expect("KEYWORD", "true"))
+            
+        elif self.peek("KEYWORD", "false"):
+            node.add_child(self.expect("KEYWORD", "false"))
             
         elif self.peek("LOGICAL_OPERATOR", "tidak"): # Operator NOT
             node.add_child(self.expect("LOGICAL_OPERATOR", "tidak"))
