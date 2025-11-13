@@ -140,12 +140,38 @@ class Parser:
         return node
 
     def statement(self):
-        if self.peek("IDENTIFIER"):
-            # Cek apakah ini assignment atau procedure call
-            # Untuk sekarang, kita asumsikan assignment
-            return self.assignment_statement()
-        else:
-            raise SyntaxError(f"Error Sintaks: Diharapkan sebuah statement, tetapi ditemukan '{self.current_token.value}'")
+            # 1. Cek Compound Statement (Blok mulai ... selesai)
+            if self.peek("KEYWORD", "mulai"):
+                return self.compound_statement()
+                
+            # 2. Cek If Statement (Percabangan)
+            elif self.peek("KEYWORD", "jika"):
+                return self.if_statement()
+                
+            # 3. Cek While Statement (Perulangan)
+            elif self.peek("KEYWORD", "selama"):
+                return self.while_statement()
+                
+            # 4. Cek For Statement (Perulangan Counter)
+            elif self.peek("KEYWORD", "untuk"):
+                return self.for_statement()
+                
+            # 5. Cek Identifier (Bisa Assignment ATAU Procedure Call)
+            elif self.peek("IDENTIFIER"):
+                # Intip token setelah identifier untuk membedakan
+                next_token_idx = self.token_index + 1
+                if next_token_idx < len(self.tokens) and \
+                self.tokens[next_token_idx].type == "ASSIGN_OPERATOR":
+                    return self.assignment_statement()
+                else:
+                    return self.procedure_call()
+                    
+            # 6. Handle Empty Statement (titik koma berlebih)
+            elif self.peek("SEMICOLON"):
+                return Node("<empty-statement>")
+                
+            else:
+                raise SyntaxError(f"Error Sintaks: Diharapkan statement, ditemukan '{self.current_token.value}'")
 
     def assignment_statement(self):
         node = Node("<assignment-statement>")
@@ -163,7 +189,11 @@ class Parser:
         """
         node = Node("<expression>")
         node.add_child(self.simple_expression())
-        # TODO: Tambahkan logika untuk relational operator di sini
+        # Cek Operator Relasional
+        if self.current_token and self.current_token.type == "RELATIONAL_OPERATOR":
+            node.add_child(self.expect("RELATIONAL_OPERATOR"))
+            node.add_child(self.simple_expression())
+
         return node
 
     def simple_expression(self):
@@ -171,6 +201,11 @@ class Parser:
         Aturan produksi: <simple-expression> -> <term> ( <additive-operator> <term> )*
         """
         node = Node("<simple-expression>")
+
+        # Handle unary operator (+/-) di depan angka (misal: -5)
+        if self.peek("ARITHMETIC_OPERATOR", "+") or self.peek("ARITHMETIC_OPERATOR", "-"):
+             node.add_child(self.expect("ARITHMETIC_OPERATOR"))
+
         node.add_child(self.term()) # Selalu dimulai dengan term
 
         # Loop jika ada operator tambah/kurang
@@ -178,12 +213,13 @@ class Parser:
             op_token = self.current_token
             if op_token.value == '+':
                 node.add_child(self.expect("ARITHMETIC_OPERATOR", "+"))
+                node.add_child(self.term())
             elif op_token.value == '-':
                  node.add_child(self.expect("ARITHMETIC_OPERATOR", "-"))
+                 node.add_child(self.term())
             elif op_token.value.lower() == 'atau':
                  node.add_child(self.expect("LOGICAL_OPERATOR", "atau"))
-            
-            node.add_child(self.term())
+                 node.add_child(self.term())
         
         return node
 
@@ -196,19 +232,23 @@ class Parser:
 
         # Loop jika ada operator kali/bagi
         while self.current_token and self.current_token.value in ['*', '/', 'bagi', 'mod', 'dan']:
-            op_token = self.current_token
-            if op_token.value == '*':
+            if self.peek("ARITHMETIC_OPERATOR", "*"):
                 node.add_child(self.expect("ARITHMETIC_OPERATOR", "*"))
-            elif op_token.value == '/':
+                node.add_child(self.factor())
+            elif self.peek("ARITHMETIC_OPERATOR", "/"):
                 node.add_child(self.expect("ARITHMETIC_OPERATOR", "/"))
-            elif op_token.value.lower() == 'bagi':
+                node.add_child(self.factor())
+            elif self.peek("ARITHMETIC_OPERATOR", "bagi"): # div
                 node.add_child(self.expect("ARITHMETIC_OPERATOR", "bagi"))
-            elif op_token.value.lower() == 'mod':
+                node.add_child(self.factor())
+            elif self.peek("ARITHMETIC_OPERATOR", "mod"): # mod
                 node.add_child(self.expect("ARITHMETIC_OPERATOR", "mod"))
-            elif op_token.value.lower() == 'dan':
+                node.add_child(self.factor())
+            elif self.peek("LOGICAL_OPERATOR", "dan"): # and
                 node.add_child(self.expect("LOGICAL_OPERATOR", "dan"))
-
-            node.add_child(self.factor())
+                node.add_child(self.factor())
+            else:
+                break
         
         return node
 
@@ -219,14 +259,118 @@ class Parser:
         node = Node("<factor>")
         
         if self.peek("IDENTIFIER"):
-            node.add_child(self.expect("IDENTIFIER"))
+            # Cek apakah ini Function Call (ID diikuti kurung buka)
+            next_token_idx = self.token_index + 1
+            if next_token_idx < len(self.tokens) and self.tokens[next_token_idx].type == "LPARENTHESIS":
+                 node.add_child(self.function_call())
+            else:
+                 node.add_child(self.expect("IDENTIFIER"))
+                 
         elif self.peek("NUMBER"):
             node.add_child(self.expect("NUMBER"))
+            
+        elif self.peek("STRING_LITERAL"):
+            node.add_child(self.expect("STRING_LITERAL"))
+            
+        elif self.peek("CHAR_LITERAL"):
+            node.add_child(self.expect("CHAR_LITERAL"))
+            
+        elif self.peek("LOGICAL_OPERATOR", "tidak"): # Operator NOT
+            node.add_child(self.expect("LOGICAL_OPERATOR", "tidak"))
+            node.add_child(self.factor())
+            
         elif self.peek("LPARENTHESIS", "("):
             node.add_child(self.expect("LPARENTHESIS", "("))
             node.add_child(self.expression())
             node.add_child(self.expect("RPARENTHESIS", ")"))
+            
         else:
-            raise SyntaxError(f"Error Sintaks: Diharapkan factor (identifier, number, atau '(expr)'), tetapi ditemukan '{self.current_token.value}'")
+            val = self.current_token.value if self.current_token else "EOF"
+            raise SyntaxError(f"Error Sintaks: Diharapkan factor, ditemukan '{val}'")
         
+        return node
+    
+    # Control Flow Statements
+    def if_statement(self):
+        # Grammar: jika <expression> maka <statement> [selain-itu <statement>]
+        node = Node("<if-statement>")
+        node.add_child(self.expect("KEYWORD", "jika"))
+        node.add_child(self.expression())
+        node.add_child(self.expect("KEYWORD", "maka"))
+        node.add_child(self.statement())
+        
+        # Cek apakah ada 'selain-itu' (else)
+        if self.peek("KEYWORD", "selain-itu"):
+            node.add_child(self.expect("KEYWORD", "selain-itu"))
+            node.add_child(self.statement())
+            
+        return node
+
+    def while_statement(self):
+        # Grammar: selama <expression> lakukan <statement>
+        node = Node("<while-statement>")
+        node.add_child(self.expect("KEYWORD", "selama"))
+        node.add_child(self.expression())
+        node.add_child(self.expect("KEYWORD", "lakukan"))
+        node.add_child(self.statement())
+        return node
+
+    def for_statement(self):
+        # Grammar: untuk <id> := <expr> ke/turun-ke <expr> lakukan <statement>
+        node = Node("<for-statement>")
+        node.add_child(self.expect("KEYWORD", "untuk"))
+        node.add_child(self.expect("IDENTIFIER"))
+        node.add_child(self.expect("ASSIGN_OPERATOR", ":="))
+        node.add_child(self.expression())
+        
+        # Cek arah loop
+        if self.peek("KEYWORD", "ke"):
+            node.add_child(self.expect("KEYWORD", "ke"))
+        elif self.peek("KEYWORD", "turun-ke"):
+            node.add_child(self.expect("KEYWORD", "turun-ke"))
+        else:
+            raise SyntaxError("Error Sintaks: Diharapkan 'ke' atau 'turun-ke' dalam loop 'untuk'.")
+            
+        node.add_child(self.expression())
+        node.add_child(self.expect("KEYWORD", "lakukan"))
+        node.add_child(self.statement())
+        return node
+    
+    # Procedure Call
+    def procedure_call(self):
+        # Grammar: IDENTIFIER [ ( <parameter-list> ) ]
+        node = Node("<procedure-call>")
+        node.add_child(self.expect("IDENTIFIER"))
+        
+        # Cek parameter (opsional)
+        if self.peek("LPARENTHESIS", "("):
+            node.add_child(self.expect("LPARENTHESIS", "("))
+            node.add_child(self.parameter_list())
+            node.add_child(self.expect("RPARENTHESIS", ")"))
+            
+        return node
+
+    def parameter_list(self):
+        # Grammar: <expression> (, <expression>)*
+        node = Node("<parameter-list>")
+        node.add_child(self.expression())
+        
+        while self.peek("COMMA", ","):
+            node.add_child(self.expect("COMMA", ","))
+            node.add_child(self.expression())
+            
+        return node
+    
+    # Function Call
+    def function_call(self):
+        # Mirip procedure call tapi mengembalikan nilai (bagian dari factor)
+        node = Node("<function-call>")
+        node.add_child(self.expect("IDENTIFIER"))
+        node.add_child(self.expect("LPARENTHESIS", "("))
+        
+        # Parameter opsional untuk fungsi
+        if not self.peek("RPARENTHESIS", ")"):
+             node.add_child(self.parameter_list())
+             
+        node.add_child(self.expect("RPARENTHESIS", ")"))
         return node
