@@ -11,7 +11,8 @@
         "S_ASSIGN": "ASSIGN_OPERATOR",
         "S_LPAREN": "LPARENTHESIS",
         "S_RPAREN": "RPARENTHESIS",
-    "S_DOT": "DOT",
+        "S_DOT": "DOT",
+        "S_RANGE": "RANGE_OPERATOR",
         "S_STRING_END": "STRING_LITERAL",
         "S_GT": "RELATIONAL_OPERATOR",
         "S_GTE": "RELATIONAL_OPERATOR",
@@ -70,7 +71,10 @@
         "S_ASSIGN": {},
         "S_LPAREN": {},
         "S_RPAREN": {},
-        "S_DOT": {},
+        "S_DOT": {
+            ".": "S_RANGE"
+        },
+        "S_RANGE": {},
         "S_STRING": {
             "letter": "S_STRING",
             "digit": "S_STRING",

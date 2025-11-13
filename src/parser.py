@@ -252,8 +252,7 @@ class Parser:
     def range_spec(self):
         node = Node("<range>")
         node.add_child(self.expression())
-        node.add_child(self.expect("DOT", "."))
-        node.add_child(self.expect("DOT", "."))
+        node.add_child(self.expect("RANGE_OPERATOR", ".."))
         node.add_child(self.expression())
         return node
 
