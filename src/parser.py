@@ -62,7 +62,7 @@ class Parser:
         expected_val = f" dengan nilai '{value}'" if value else ""
         current_val = f"'{self.current_token.value}' ({self.current_token.type})" if self.current_token else "None"
         raise SyntaxError(
-            f"Error Sintaks: Diharapkan token {token_type}{expected_val}, tetapi ditemukan {current_val}."
+            f"Error Sintaks: Diharapkan token {token_type}{expected_val}, tetapi ditemukan {current_val} pada posisi {self.token_index}."
         )
 
     def peek(self, token_type, value=None):
@@ -96,13 +96,18 @@ class Parser:
         node = Node("<declaration-part>")
         while self.peek("KEYWORD", "variabel") or \
               self.peek("KEYWORD", "konstanta") or \
-                self.peek("KEYWORD", "tipe"):
+              self.peek("KEYWORD", "tipe") or \
+              self.peek("KEYWORD", "prosedur") or \
+              self.peek("KEYWORD", "fungsi"):
+            
             if self.peek("KEYWORD", "variabel"):
                 node.add_child(self.var_declaration())
             if self.peek("KEYWORD", "konstanta"):
                 node.add_child(self.const_declaration())
             if self.peek("KEYWORD", "tipe"):
                 node.add_child(self.type_declaration())
+            if self.peek("KEYWORD", "prosedur") or self.peek("KEYWORD", "fungsi"):
+                node.add_child(self.subprogram_declaration())
         return node
 
     def compound_statement(self):
@@ -148,6 +153,62 @@ class Parser:
             type_node.add_child(self.type_spec())
             type_node.add_child(self.expect("SEMICOLON", ";"))
             node.add_child(type_node)
+        return node
+    
+    def subprogram_declaration(self):
+        node = Node("<subprogram-declaration>")
+        while self.peek("KEYWORD", "prosedur") or self.peek("KEYWORD", "fungsi"):
+            if self.peek("KEYWORD", "prosedur"):
+                node.add_child(self.procedure_declaration())
+            elif self.peek("KEYWORD", "fungsi"):
+                node.add_child(self.function_declaration())
+        return node
+    
+    def procedure_declaration(self):
+        node = Node("<procedure-declaration>")
+        node.add_child(self.expect("KEYWORD", "prosedur"))
+        node.add_child(self.expect("IDENTIFIER"))
+        
+        if self.peek("LPARENTHESIS", "("):
+            node.add_child(self.formal_parameter_list())
+        
+        node.add_child(self.expect("SEMICOLON", ";"))
+        node.add_child(self.declaration_part())
+        node.add_child(self.compound_statement())
+        node.add_child(self.expect("SEMICOLON", ";"))
+        return node
+    
+    def function_declaration(self):
+        node = Node("<function-declaration>")
+        node.add_child(self.expect("KEYWORD", "fungsi"))
+        node.add_child(self.expect("IDENTIFIER"))
+        
+        if self.peek("LPARENTHESIS", "("):
+            node.add_child(self.formal_parameter_list())
+        
+        node.add_child(self.expect("COLON", ":"))
+        node.add_child(self.type_spec())
+        node.add_child(self.expect("SEMICOLON", ";"))
+        node.add_child(self.declaration_part())
+        node.add_child(self.compound_statement())
+        node.add_child(self.expect("SEMICOLON", ";"))
+        return node
+
+    def formal_parameter_list(self):
+        node = Node("<formal-parameter-list>")
+        node.add_child(self.expect("LPARENTHESIS", "("))
+        node.add_child(self.parameter_group())
+        while self.peek("SEMICOLON", ";"):
+            node.add_child(self.expect("SEMICOLON", ";"))
+            node.add_child(self.parameter_group())
+        node.add_child(self.expect("RPARENTHESIS", ")"))
+        return node
+    
+    def parameter_group(self):
+        node = Node("<parameter-group>")
+        node.add_child(self.identifier_list())
+        node.add_child(self.expect("COLON", ":"))
+        node.add_child(self.type_spec())
         return node
 
     def identifier_list(self):
