@@ -239,14 +239,14 @@ class Parser:
         else:
             expr_node = self.expression() 
             
-            if self.peek("DOT", "."):
+            if self.peek("RANGE_OPERATOR", ".."):
                 subrange_node = Node("<subrange-type>")
                 subrange_node.add_child(expr_node)
-                subrange_node.add_child(self.expect("RANGE_OPERATOR", ".."))
+                subrange_node.add_child(self.expect("RANGE_OPERATOR", "..")) 
                 subrange_node.add_child(self.expression()) # Ambil expression kedua
                 node.add_child(subrange_node)
             else:
-                node.add_child(expr_node) # Node-nya adalah 'Range'
+                node.add_child(expr_node) 
         return node
     
     def range_spec(self):
