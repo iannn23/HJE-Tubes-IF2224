@@ -2,13 +2,18 @@ import sys
 import os
 from lexer import Lexer
 from pascal_token import Token 
+from parser import Parser
 
 # KEYWORD Pascal-S
 PASCAL_S_KEYWORDS = [
     # Keyword
     "program", "var", "begin", "end", "if", "then", "else", "while", "do", 
     "for", "to", "downto", "integer", "real", "boolean", "char", "array", 
-    "of", "procedure", "function", "const", "type", "true", "false"
+    "of", "procedure", "function", "const", "type", "true", "false",
+    # Padanan Bahasa Indonesia
+    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain-itu", "selama", "kerjakan",
+    "untuk", "ke", "turun-ke", "integer", "real", "boolean", "char", "larik",
+    "dari", "prosedur", "fungsi", "konstanta", "tipe", "true", "false"
 ]
 
 def main():
@@ -41,8 +46,8 @@ def main():
     # 4. Melakukan Scanning
     tokens = lexer.run_scanner(source_code)
 
-    # 5. Penghasilan Output
     if tokens:
+        # 5. Penghasilan Output Token ke File (Sesuai Milestone 1)
         input_path = pascal_file 
         input_filename = os.path.basename(input_path)
         
@@ -62,10 +67,25 @@ def main():
                     f.write(str(token) + '\n')
             print(f"Output berhasil ditulis ke: {output_path}")
         except Exception as e:
-            print(f"Gagal menulis file output: {e}")
+            print(f"Gagal menulis file output token: {e}")
+
+        # 6. Inisialisasi dan Jalankan Parser (Syntax Analysis)
+        print("\nLexer selesai. Memulai parser...")
+        parser = Parser(tokens)
+        try:
+            parse_tree = parser.parse()
+            
+            if parse_tree:
+                print("\nParse Tree berhasil dibuat:")
+                print(parse_tree)
+            else:
+                print("Tidak ada output dari parser.")
+
+        except SyntaxError as e:
+            print(f"\n[PARSING GAGAL] {e}")
 
     else:
-        print("Tidak ada token yang dihasilkan atau terjadi error.")
+        print("Tidak ada token yang dihasilkan oleh lexer.")
         
 if __name__ == "__main__":
     main()
