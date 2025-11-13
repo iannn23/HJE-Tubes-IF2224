@@ -1,10 +1,11 @@
-program Hello;
+program HitungDasar;
 
 variabel
-  a, b: integer;
+  x, y, hasil: integer;
 
 mulai
-  a := 5;
-  b := a + 10;
-  writeln('Result = ', b);
+  x := 10;
+  y := 5;
+  hasil := x + y * 2;
+  writeln('Hasil perhitungan = ', hasil);
 selesai.
