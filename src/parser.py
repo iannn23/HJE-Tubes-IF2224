@@ -505,15 +505,15 @@ class Parser:
     
     # Procedure Call
     def procedure_call(self):
-        # Grammar: IDENTIFIER [ ( <parameter-list> ) ]
+        # Grammar: IDENTIFIER ( [ <parameter-list> ] )
         node = Node("<procedure-call>")
         node.add_child(self.expect("IDENTIFIER"))
+        node.add_child(self.expect("LPARENTHESIS", "("))
         
-        # Cek parameter (opsional)
-        if self.peek("LPARENTHESIS", "("):
-            node.add_child(self.expect("LPARENTHESIS", "("))
-            node.add_child(self.parameter_list())
-            node.add_child(self.expect("RPARENTHESIS", ")"))
+        if not self.peek("RPARENTHESIS", ")"):
+             node.add_child(self.parameter_list())
+
+        node.add_child(self.expect("RPARENTHESIS", ")"))
             
         return node
 
