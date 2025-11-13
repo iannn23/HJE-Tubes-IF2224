@@ -1,5 +1,6 @@
 import sys
 import os
+import io
 from lexer import Lexer
 from pascal_token import Token 
 from parser import Parser
@@ -77,22 +78,27 @@ def main():
             
             if parse_tree:
                 print("\nParse Tree berhasil dibuat:")
-                parse_tree.print_tree() # Tetap tampilkan di console
+                parse_tree.print_tree() 
 
                 try:
-
                     parsetree_filename = f"parsetree-{test_number}.txt"
                     parsetree_output_path = os.path.join(output_dir, parsetree_filename)
                     
-                    tree_string = str(parse_tree) 
+                    f_buffer = io.StringIO()
+                    original_stdout = sys.stdout  
+                    sys.stdout = f_buffer         
+
+                    parse_tree.print_tree()
+                    
+                    sys.stdout = original_stdout
+                    tree_string = f_buffer.getvalue()
                     
                     with open(parsetree_output_path, 'w', encoding='utf-8') as f:
                         f.write(tree_string)
-                    print(f"Parse tree berhasil ditulis ke: {parsetree_output_path}")
+                    print(f"Parse tree (format tree) berhasil ditulis ke: {parsetree_output_path}")
                 
                 except Exception as e:
                     print(f"Gagal menulis file parse tree: {e}")
-
             else:
                 print("Tidak ada output dari parser.")
 

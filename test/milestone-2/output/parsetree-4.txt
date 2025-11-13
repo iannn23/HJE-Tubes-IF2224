@@ -1,120 +1,120 @@
 <program>
-	<program-header>
-		KEYWORD(program)
-		IDENTIFIER(SubProgramTest)
-		SEMICOLON(;)
-	<declaration-part>
-		<var-declaration>
-			KEYWORD(variabel)
-			<var-list>
-				<identifier-list>
-					IDENTIFIER(angka)
-				COLON(:)
-				<type>
-					KEYWORD(integer)
-				SEMICOLON(;)
-		<subprogram-declaration>
-			<function-declaration>
-				KEYWORD(fungsi)
-				IDENTIFIER(kuadrat)
-				<formal-parameter-list>
-					LPARENTHESIS(()
-					<parameter-group>
-						<identifier-list>
-							IDENTIFIER(n)
-						COLON(:)
-						<type>
-							KEYWORD(integer)
-					RPARENTHESIS())
-				COLON(:)
-				<type>
-					KEYWORD(integer)
-				SEMICOLON(;)
-				<declaration-part>
-				<compound-statement>
-					KEYWORD(mulai)
-					<statement-list>
-						<assignment-statement>
-							IDENTIFIER(kuadrat)
-							ASSIGN_OPERATOR(:=)
-							<expression>
-								<simple-expression>
-									<term>
-										<factor>
-											IDENTIFIER(n)
-										ARITHMETIC_OPERATOR(*)
-										<factor>
-											IDENTIFIER(n)
-						SEMICOLON(;)
-					KEYWORD(selesai)
-				SEMICOLON(;)
-			<procedure-declaration>
-				KEYWORD(prosedur)
-				IDENTIFIER(tampilkan)
-				<formal-parameter-list>
-					LPARENTHESIS(()
-					<parameter-group>
-						<identifier-list>
-							IDENTIFIER(x)
-						COLON(:)
-						<type>
-							KEYWORD(integer)
-					RPARENTHESIS())
-				SEMICOLON(;)
-				<declaration-part>
-				<compound-statement>
-					KEYWORD(mulai)
-					<statement-list>
-						<procedure-call>
-							IDENTIFIER(writeln)
-							LPARENTHESIS(()
-							<parameter-list>
-								<expression>
-									<simple-expression>
-										<term>
-											<factor>
-												STRING_LITERAL('Nilai adalah: ')
-								COMMA(,)
-								<expression>
-									<simple-expression>
-										<term>
-											<factor>
-												IDENTIFIER(x)
-							RPARENTHESIS())
-						SEMICOLON(;)
-					KEYWORD(selesai)
-				SEMICOLON(;)
-	<compound-statement>
-		KEYWORD(mulai)
-		<statement-list>
-			<assignment-statement>
-				IDENTIFIER(angka)
-				ASSIGN_OPERATOR(:=)
-				<expression>
-					<simple-expression>
-						<term>
-							<factor>
-								NUMBER(5)
-			SEMICOLON(;)
-			<procedure-call>
-				IDENTIFIER(tampilkan)
-				LPARENTHESIS(()
-				<parameter-list>
-					<expression>
-						<simple-expression>
-							<term>
-								<factor>
-									<function-call>
-										IDENTIFIER(kuadrat)
-										LPARENTHESIS(()
-										<parameter-list>
-											<expression>
-												<simple-expression>
-													<term>
-														<factor>
-															IDENTIFIER(angka)
-										RPARENTHESIS())
-				RPARENTHESIS())
-			SEMICOLON(;)
-		KEYWORD(selesai)
-	DOT(.)
+├── <program-header>
+│   ├── KEYWORD(program)
+│   ├── IDENTIFIER(SubProgramTest)
+│   └── SEMICOLON(;)
+├── <declaration-part>
+│   ├── <var-declaration>
+│   │   ├── KEYWORD(variabel)
+│   │   └── <var-list>
+│   │       ├── <identifier-list>
+│   │       │   └── IDENTIFIER(angka)
+│   │       ├── COLON(:)
+│   │       ├── <type>
+│   │       │   └── KEYWORD(integer)
+│   │       └── SEMICOLON(;)
+│   └── <subprogram-declaration>
+│       ├── <function-declaration>
+│       │   ├── KEYWORD(fungsi)
+│       │   ├── IDENTIFIER(kuadrat)
+│       │   ├── <formal-parameter-list>
+│       │   │   ├── LPARENTHESIS(()
+│       │   │   ├── <parameter-group>
+│       │   │   │   ├── <identifier-list>
+│       │   │   │   │   └── IDENTIFIER(n)
+│       │   │   │   ├── COLON(:)
+│       │   │   │   └── <type>
+│       │   │   │       └── KEYWORD(integer)
+│       │   │   └── RPARENTHESIS())
+│       │   ├── COLON(:)
+│       │   ├── <type>
+│       │   │   └── KEYWORD(integer)
+│       │   ├── SEMICOLON(;)
+│       │   ├── <declaration-part>
+│       │   ├── <compound-statement>
+│       │   │   ├── KEYWORD(mulai)
+│       │   │   ├── <statement-list>
+│       │   │   │   ├── <assignment-statement>
+│       │   │   │   │   ├── IDENTIFIER(kuadrat)
+│       │   │   │   │   ├── ASSIGN_OPERATOR(:=)
+│       │   │   │   │   └── <expression>
+│       │   │   │   │       └── <simple-expression>
+│       │   │   │   │           └── <term>
+│       │   │   │   │               ├── <factor>
+│       │   │   │   │               │   └── IDENTIFIER(n)
+│       │   │   │   │               ├── ARITHMETIC_OPERATOR(*)
+│       │   │   │   │               └── <factor>
+│       │   │   │   │                   └── IDENTIFIER(n)
+│       │   │   │   └── SEMICOLON(;)
+│       │   │   └── KEYWORD(selesai)
+│       │   └── SEMICOLON(;)
+│       └── <procedure-declaration>
+│           ├── KEYWORD(prosedur)
+│           ├── IDENTIFIER(tampilkan)
+│           ├── <formal-parameter-list>
+│           │   ├── LPARENTHESIS(()
+│           │   ├── <parameter-group>
+│           │   │   ├── <identifier-list>
+│           │   │   │   └── IDENTIFIER(x)
+│           │   │   ├── COLON(:)
+│           │   │   └── <type>
+│           │   │       └── KEYWORD(integer)
+│           │   └── RPARENTHESIS())
+│           ├── SEMICOLON(;)
+│           ├── <declaration-part>
+│           ├── <compound-statement>
+│           │   ├── KEYWORD(mulai)
+│           │   ├── <statement-list>
+│           │   │   ├── <procedure-call>
+│           │   │   │   ├── IDENTIFIER(writeln)
+│           │   │   │   ├── LPARENTHESIS(()
+│           │   │   │   ├── <parameter-list>
+│           │   │   │   │   ├── <expression>
+│           │   │   │   │   │   └── <simple-expression>
+│           │   │   │   │   │       └── <term>
+│           │   │   │   │   │           └── <factor>
+│           │   │   │   │   │               └── STRING_LITERAL('Nilai adalah: ')
+│           │   │   │   │   ├── COMMA(,)
+│           │   │   │   │   └── <expression>
+│           │   │   │   │       └── <simple-expression>
+│           │   │   │   │           └── <term>
+│           │   │   │   │               └── <factor>
+│           │   │   │   │                   └── IDENTIFIER(x)
+│           │   │   │   └── RPARENTHESIS())
+│           │   │   └── SEMICOLON(;)
+│           │   └── KEYWORD(selesai)
+│           └── SEMICOLON(;)
+├── <compound-statement>
+│   ├── KEYWORD(mulai)
+│   ├── <statement-list>
+│   │   ├── <assignment-statement>
+│   │   │   ├── IDENTIFIER(angka)
+│   │   │   ├── ASSIGN_OPERATOR(:=)
+│   │   │   └── <expression>
+│   │   │       └── <simple-expression>
+│   │   │           └── <term>
+│   │   │               └── <factor>
+│   │   │                   └── NUMBER(5)
+│   │   ├── SEMICOLON(;)
+│   │   ├── <procedure-call>
+│   │   │   ├── IDENTIFIER(tampilkan)
+│   │   │   ├── LPARENTHESIS(()
+│   │   │   ├── <parameter-list>
+│   │   │   │   └── <expression>
+│   │   │   │       └── <simple-expression>
+│   │   │   │           └── <term>
+│   │   │   │               └── <factor>
+│   │   │   │                   └── <function-call>
+│   │   │   │                       ├── IDENTIFIER(kuadrat)
+│   │   │   │                       ├── LPARENTHESIS(()
+│   │   │   │                       ├── <parameter-list>
+│   │   │   │                       │   └── <expression>
+│   │   │   │                       │       └── <simple-expression>
+│   │   │   │                       │           └── <term>
+│   │   │   │                       │               └── <factor>
+│   │   │   │                       │                   └── IDENTIFIER(angka)
+│   │   │   │                       └── RPARENTHESIS())
+│   │   │   └── RPARENTHESIS())
+│   │   └── SEMICOLON(;)
+│   └── KEYWORD(selesai)
+└── DOT(.)
