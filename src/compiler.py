@@ -77,7 +77,7 @@ def main():
             
             if parse_tree:
                 print("\nParse Tree berhasil dibuat:")
-                print(parse_tree)
+                parse_tree.print_tree()
             else:
                 print("Tidak ada output dari parser.")
 

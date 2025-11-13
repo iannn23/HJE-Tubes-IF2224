@@ -20,6 +20,21 @@ class Node:
         for child in self.children:
             ret += child.__repr__(level + 1)
         return ret
+    
+    def print_tree(self, prefix="", is_last=True, is_root=True):
+        if is_root:
+            print(self.name)
+            new_prefix = ""
+        else:
+            connector = "└── " if is_last else "├── "
+            print(f"{prefix}{connector}{self.name}")
+            
+            new_prefix = prefix + ("    " if is_last else "│   ")
+
+        child_count = len(self.children)
+        for i, child in enumerate(self.children):
+            is_last_child = (i == child_count - 1)
+            child.print_tree(new_prefix, is_last_child, is_root=False)
 
 class Parser:
     """
@@ -47,7 +62,7 @@ class Parser:
         expected_val = f" dengan nilai '{value}'" if value else ""
         current_val = f"'{self.current_token.value}' ({self.current_token.type})" if self.current_token else "None"
         raise SyntaxError(
-            f"Error Sintaks: Diharapkan token {token_type}{expected_val}, tetapi ditemukan {current_val}"
+            f"Error Sintaks: Diharapkan token {token_type}{expected_val}, tetapi ditemukan {current_val}."
         )
 
     def peek(self, token_type, value=None):
@@ -79,10 +94,17 @@ class Parser:
 
     def declaration_part(self):
         node = Node("<declaration-part>")
-        if self.peek("KEYWORD", "variabel"):
-            node.add_child(self.var_declaration())
+        while self.peek("KEYWORD", "variabel") or \
+              self.peek("KEYWORD", "konstanta") or \
+                self.peek("KEYWORD", "tipe"):
+            if self.peek("KEYWORD", "variabel"):
+                node.add_child(self.var_declaration())
+            if self.peek("KEYWORD", "konstanta"):
+                node.add_child(self.const_declaration())
+            if self.peek("KEYWORD", "tipe"):
+                node.add_child(self.type_declaration())
         return node
-        
+
     def compound_statement(self):
         node = Node("<compound-statement>")
         node.add_child(self.expect("KEYWORD", "mulai"))
@@ -103,6 +125,30 @@ class Parser:
             var_list_node.add_child(self.expect("SEMICOLON", ";"))
             node.add_child(var_list_node)
         return node
+    
+    def const_declaration(self):
+        node = Node("<const-declaration>")
+        node.add_child(self.expect("KEYWORD", "konstanta"))
+        while self.peek("IDENTIFIER"):
+            const_node = Node("<const-decl>")
+            const_node.add_child(self.expect("IDENTIFIER"))
+            const_node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
+            const_node.add_child(self.expect("NUMBER"))
+            const_node.add_child(self.expect("SEMICOLON", ";"))
+            node.add_child(const_node)
+        return node
+    
+    def type_declaration(self):
+        node = Node("<type-declaration>")
+        node.add_child(self.expect("KEYWORD", "tipe"))
+        while self.peek("IDENTIFIER"):
+            type_node = Node("<type-decl>")  
+            type_node.add_child(self.expect("IDENTIFIER"))
+            type_node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
+            type_node.add_child(self.type_spec())
+            type_node.add_child(self.expect("SEMICOLON", ";"))
+            node.add_child(type_node)
+        return node
 
     def identifier_list(self):
         node = Node("<identifier-list>")
@@ -122,8 +168,32 @@ class Parser:
             node.add_child(self.expect("KEYWORD", "boolean"))
         elif self.peek("KEYWORD", "char"):
             node.add_child(self.expect("KEYWORD", "char"))
+        elif self.peek("KEYWORD", "larik"):
+            node.add_child(self.expect("KEYWORD", "larik"))
+            node.add_child(self.expect("LBRACKET", "["))
+            node.add_child(self.range_spec())
+            node.add_child(self.expect("RBRACKET", "]"))
+            node.add_child(self.expect("KEYWORD", "dari"))
+            node.add_child(self.type_spec())
         else:
-            raise SyntaxError(f"Error Sintaks: Tipe data tidak valid '{self.current_token.value}'")
+            expr_node = self.expression() 
+            
+            if self.peek("DOT", "."):
+                subrange_node = Node("<subrange-type>")
+                subrange_node.add_child(expr_node)
+                subrange_node.add_child(self.expect("RANGE_OPERATOR", ".."))
+                subrange_node.add_child(self.expression()) # Ambil expression kedua
+                node.add_child(subrange_node)
+            else:
+                node.add_child(expr_node) # Node-nya adalah 'Range'
+        return node
+    
+    def range_spec(self):
+        node = Node("<range>")
+        node.add_child(self.expression())
+        node.add_child(self.expect("DOT", "."))
+        node.add_child(self.expect("DOT", "."))
+        node.add_child(self.expression())
         return node
 
     # --- ATURAN PRODUKSI STATEMENT ---
@@ -374,3 +444,5 @@ class Parser:
              
         node.add_child(self.expect("RPARENTHESIS", ")"))
         return node
+    
+    
