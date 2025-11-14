@@ -6,13 +6,12 @@
 ├── <declaration-part>
 │   ├── <var-declaration>
 │   │   ├── KEYWORD(variabel)
-│   │   └── <var-list>
-│   │       ├── <identifier-list>
-│   │       │   └── IDENTIFIER(angka)
-│   │       ├── COLON(:)
-│   │       ├── <type>
-│   │       │   └── KEYWORD(integer)
-│   │       └── SEMICOLON(;)
+│   │   ├── <identifier-list>
+│   │   │   └── IDENTIFIER(angka)
+│   │   ├── COLON(:)
+│   │   ├── <type>
+│   │   │   └── KEYWORD(integer)
+│   │   └── SEMICOLON(;)
 │   └── <subprogram-declaration>
 │       ├── <function-declaration>
 │       │   ├── KEYWORD(fungsi)

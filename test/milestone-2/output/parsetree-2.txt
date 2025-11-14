@@ -6,20 +6,18 @@
 ├── <declaration-part>
 │   └── <var-declaration>
 │       ├── KEYWORD(variabel)
-│       ├── <var-list>
-│       │   ├── <identifier-list>
-│       │   │   └── IDENTIFIER(nilai)
-│       │   ├── COLON(:)
-│       │   ├── <type>
-│       │   │   └── KEYWORD(integer)
-│       │   └── SEMICOLON(;)
-│       └── <var-list>
-│           ├── <identifier-list>
-│           │   └── IDENTIFIER(lulus)
-│           ├── COLON(:)
-│           ├── <type>
-│           │   └── KEYWORD(boolean)
-│           └── SEMICOLON(;)
+│       ├── <identifier-list>
+│       │   └── IDENTIFIER(nilai)
+│       ├── COLON(:)
+│       ├── <type>
+│       │   └── KEYWORD(integer)
+│       ├── SEMICOLON(;)
+│       ├── <identifier-list>
+│       │   └── IDENTIFIER(lulus)
+│       ├── COLON(:)
+│       ├── <type>
+│       │   └── KEYWORD(boolean)
+│       └── SEMICOLON(;)
 ├── <compound-statement>
 │   ├── KEYWORD(mulai)
 │   ├── <statement-list>

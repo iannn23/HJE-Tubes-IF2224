@@ -6,15 +6,14 @@
 ├── <declaration-part>
 │   └── <var-declaration>
 │       ├── KEYWORD(variabel)
-│       └── <var-list>
-│           ├── <identifier-list>
-│           │   ├── IDENTIFIER(i)
-│           │   ├── COMMA(,)
-│           │   └── IDENTIFIER(total)
-│           ├── COLON(:)
-│           ├── <type>
-│           │   └── KEYWORD(integer)
-│           └── SEMICOLON(;)
+│       ├── <identifier-list>
+│       │   ├── IDENTIFIER(i)
+│       │   ├── COMMA(,)
+│       │   └── IDENTIFIER(total)
+│       ├── COLON(:)
+│       ├── <type>
+│       │   └── KEYWORD(integer)
+│       └── SEMICOLON(;)
 ├── <compound-statement>
 │   ├── KEYWORD(mulai)
 │   ├── <statement-list>

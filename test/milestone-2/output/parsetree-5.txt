@@ -6,56 +6,52 @@
 ├── <declaration-part>
 │   ├── <const-declaration>
 │   │   ├── KEYWORD(konstanta)
-│   │   └── <const-decl>
-│   │       ├── IDENTIFIER(MAX)
-│   │       ├── RELATIONAL_OPERATOR(=)
-│   │       ├── NUMBER(100)
-│   │       └── SEMICOLON(;)
+│   │   ├── IDENTIFIER(MAX)
+│   │   ├── RELATIONAL_OPERATOR(=)
+│   │   ├── NUMBER(100)
+│   │   └── SEMICOLON(;)
 │   ├── <type-declaration>
 │   │   ├── KEYWORD(tipe)
-│   │   └── <type-decl>
-│   │       ├── IDENTIFIER(Vektor)
-│   │       ├── RELATIONAL_OPERATOR(=)
-│   │       ├── <type>
-│   │       │   ├── KEYWORD(larik)
-│   │       │   ├── LBRACKET([)
-│   │       │   ├── <range>
-│   │       │   │   ├── <expression>
-│   │       │   │   │   └── <simple-expression>
-│   │       │   │   │       └── <term>
-│   │       │   │   │           └── <factor>
-│   │       │   │   │               └── NUMBER(1)
-│   │       │   │   ├── RANGE_OPERATOR(..)
-│   │       │   │   └── <expression>
-│   │       │   │       └── <simple-expression>
-│   │       │   │           └── <term>
-│   │       │   │               └── <factor>
-│   │       │   │                   └── NUMBER(10)
-│   │       │   ├── RBRACKET(])
-│   │       │   ├── KEYWORD(dari)
-│   │       │   └── <type>
-│   │       │       └── KEYWORD(integer)
-│   │       └── SEMICOLON(;)
+│   │   ├── IDENTIFIER(Vektor)
+│   │   ├── RELATIONAL_OPERATOR(=)
+│   │   ├── <type>
+│   │   │   ├── KEYWORD(larik)
+│   │   │   ├── LBRACKET([)
+│   │   │   ├── <range>
+│   │   │   │   ├── <expression>
+│   │   │   │   │   └── <simple-expression>
+│   │   │   │   │       └── <term>
+│   │   │   │   │           └── <factor>
+│   │   │   │   │               └── NUMBER(1)
+│   │   │   │   ├── RANGE_OPERATOR(..)
+│   │   │   │   └── <expression>
+│   │   │   │       └── <simple-expression>
+│   │   │   │           └── <term>
+│   │   │   │               └── <factor>
+│   │   │   │                   └── NUMBER(10)
+│   │   │   ├── RBRACKET(])
+│   │   │   ├── KEYWORD(dari)
+│   │   │   └── <type>
+│   │   │       └── KEYWORD(integer)
+│   │   └── SEMICOLON(;)
 │   └── <var-declaration>
 │       ├── KEYWORD(variabel)
-│       ├── <var-list>
-│       │   ├── <identifier-list>
-│       │   │   └── IDENTIFIER(data)
-│       │   ├── COLON(:)
-│       │   ├── <type>
-│       │   │   └── <expression>
-│       │   │       └── <simple-expression>
-│       │   │           └── <term>
-│       │   │               └── <factor>
-│       │   │                   └── IDENTIFIER(Vektor)
-│       │   └── SEMICOLON(;)
-│       └── <var-list>
-│           ├── <identifier-list>
-│           │   └── IDENTIFIER(idx)
-│           ├── COLON(:)
-│           ├── <type>
-│           │   └── KEYWORD(integer)
-│           └── SEMICOLON(;)
+│       ├── <identifier-list>
+│       │   └── IDENTIFIER(data)
+│       ├── COLON(:)
+│       ├── <type>
+│       │   └── <expression>
+│       │       └── <simple-expression>
+│       │           └── <term>
+│       │               └── <factor>
+│       │                   └── IDENTIFIER(Vektor)
+│       ├── SEMICOLON(;)
+│       ├── <identifier-list>
+│       │   └── IDENTIFIER(idx)
+│       ├── COLON(:)
+│       ├── <type>
+│       │   └── KEYWORD(integer)
+│       └── SEMICOLON(;)
 ├── <compound-statement>
 │   ├── KEYWORD(mulai)
 │   ├── <statement-list>

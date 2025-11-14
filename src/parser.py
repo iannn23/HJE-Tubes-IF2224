@@ -123,36 +123,30 @@ class Parser:
         node = Node("<var-declaration>")
         node.add_child(self.expect("KEYWORD", "variabel"))
         while self.peek("IDENTIFIER"):
-            var_list_node = Node("<var-list>")
-            var_list_node.add_child(self.identifier_list())
-            var_list_node.add_child(self.expect("COLON", ":"))
-            var_list_node.add_child(self.type_spec())
-            var_list_node.add_child(self.expect("SEMICOLON", ";"))
-            node.add_child(var_list_node)
+            node.add_child(self.identifier_list())
+            node.add_child(self.expect("COLON", ":"))
+            node.add_child(self.type_spec())
+            node.add_child(self.expect("SEMICOLON", ";"))
         return node
     
     def const_declaration(self):
         node = Node("<const-declaration>")
         node.add_child(self.expect("KEYWORD", "konstanta"))
         while self.peek("IDENTIFIER"):
-            const_node = Node("<const-decl>")
-            const_node.add_child(self.expect("IDENTIFIER"))
-            const_node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
-            const_node.add_child(self.expect("NUMBER"))
-            const_node.add_child(self.expect("SEMICOLON", ";"))
-            node.add_child(const_node)
+            node.add_child(self.expect("IDENTIFIER"))
+            node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
+            node.add_child(self.expect("NUMBER"))
+            node.add_child(self.expect("SEMICOLON", ";"))
         return node
     
     def type_declaration(self):
         node = Node("<type-declaration>")
         node.add_child(self.expect("KEYWORD", "tipe"))
         while self.peek("IDENTIFIER"):
-            type_node = Node("<type-decl>")  
-            type_node.add_child(self.expect("IDENTIFIER"))
-            type_node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
-            type_node.add_child(self.type_spec())
-            type_node.add_child(self.expect("SEMICOLON", ";"))
-            node.add_child(type_node)
+            node.add_child(self.expect("IDENTIFIER"))
+            node.add_child(self.expect("RELATIONAL_OPERATOR", "="))
+            node.add_child(self.type_spec())
+            node.add_child(self.expect("SEMICOLON", ";"))
         return node
     
     def subprogram_declaration(self):
