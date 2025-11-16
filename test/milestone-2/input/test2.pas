@@ -9,7 +9,7 @@ mulai
   
   jika nilai > 70 maka
     lulus := true
-  selain-itu
+  selain_itu
     lulus := false;
 
   writeln('Status Lulus: ', lulus);

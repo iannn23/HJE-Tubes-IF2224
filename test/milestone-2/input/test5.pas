@@ -12,7 +12,7 @@ variabel
 
 mulai
   idx := 1;
-  data[idx] := MAX div 2;
+  data[idx] := MAX bagi 2;
   
   jika data[1] <> 0 maka
     writeln('Data valid');

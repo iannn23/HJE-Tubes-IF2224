@@ -74,6 +74,7 @@
         "S_DOT": {
             ".": "S_RANGE"
         },
+        "S_RANGE": {},
         "S_STRING": {
             "letter": "S_STRING",
             "digit": "S_STRING",

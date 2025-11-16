@@ -13,6 +13,6 @@ mulai
     i := i + 1;
   selesai;
 
-  untuk i := 10 turun-ke 1 lakukan
+  untuk i := 10 turun_ke 1 lakukan
     writeln('Hitung mundur: ', i);
 selesai.

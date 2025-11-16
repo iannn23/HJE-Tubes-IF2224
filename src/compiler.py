@@ -1,5 +1,6 @@
 import sys
 import os
+import io
 from lexer import Lexer
 from pascal_token import Token 
 from parser import Parser
@@ -11,8 +12,8 @@ PASCAL_S_KEYWORDS = [
     "for", "to", "downto", "integer", "real", "boolean", "char", "array", 
     "of", "procedure", "function", "const", "type", "true", "false",
     # Padanan Bahasa Indonesia
-    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain-itu", "selama", "kerjakan",
-    "untuk", "ke", "turun-ke", "integer", "real", "boolean", "char", "larik",
+    "program", "variabel", "mulai", "selesai", "jika", "maka", "selain_itu", "selama", "lakukan",
+    "untuk", "ke", "turun_ke", "integer", "real", "boolean", "char", "larik",
     "dari", "prosedur", "fungsi", "konstanta", "tipe", "true", "false"
 ]
 
@@ -77,7 +78,27 @@ def main():
             
             if parse_tree:
                 print("\nParse Tree berhasil dibuat:")
-                print(parse_tree)
+                parse_tree.print_tree() 
+
+                try:
+                    parsetree_filename = f"parsetree-{test_number}.txt"
+                    parsetree_output_path = os.path.join(output_dir, parsetree_filename)
+                    
+                    f_buffer = io.StringIO()
+                    original_stdout = sys.stdout  
+                    sys.stdout = f_buffer         
+
+                    parse_tree.print_tree()
+                    
+                    sys.stdout = original_stdout
+                    tree_string = f_buffer.getvalue()
+                    
+                    with open(parsetree_output_path, 'w', encoding='utf-8') as f:
+                        f.write(tree_string)
+                    print(f"Parse tree (format tree) berhasil ditulis ke: {parsetree_output_path}")
+                
+                except Exception as e:
+                    print(f"Gagal menulis file parse tree: {e}")
             else:
                 print("Tidak ada output dari parser.")
 
