@@ -25,13 +25,14 @@ Program ini menghandle komen dan mengabaikannya. Semua whitespace dan dua koment
 Error handling sudah diimplementasikan, mampu mendeteksi dan menghasilkan output semantic ketika menemukan simbol yang tidak dikenali.
 
 ### Milestone 2: Syntax Analysis
+
 Parser, yang diimplementasikan di src/parser.py. Parser ini:
+
 - Menerima list of tokens dari Lexer sebagai input.
 - Mengimplementasikan Recursive Descent Parser untuk memvalidasi sintaks.
 - Mencocokkan urutan token dengan grammar bahasa PASCAL-S yang telah ditentukan.
 - Menghasilkan Parse Tree sebagai representasi visual dari struktur program.
 - Melakukan Syntax Error Handling: Jika urutan token tidak valid, parser akan berhenti dan melaporkan error (SyntaxError) secara informatif.
-
 
 ## Cara Instalasi dan Penggunaan Program
 
@@ -80,9 +81,9 @@ Hasil token akan disimpan di `test/milestone-2/output/parsetree-<n>.txt`.
 
 ## Pembagian Tugas
 
-| Nama                       |   NIM    |                              Pembagian Tugas |
-| :------------------------- | :------: | -------------------------------------------: |
-| Sebastian Enrico Nathanael | 13523134 |     Implementasi code, DFA, testing, Laporan |
-| Jonathan Kenan Budianto    | 13523139 |              Implementasi code, DFA, testing |
-| Mahesa Fadhillah Andre     | 13523140 |           Implementasi DFA, testing, Laporan |
-| Muhammad Farrel Wibowo     | 13523153 | Implementasi DFA, Pembuatan Diagram, testing |
+| Nama                       |   NIM    |            Pembagian Tugas |
+| :------------------------- | :------: | -------------------------: |
+| Sebastian Enrico Nathanael | 13523134 |           testing, Laporan |
+| Jonathan Kenan Budianto    | 13523139 | Implementasi code, testing |
+| Mahesa Fadhillah Andre     | 13523140 | Implementasi code, testing |
+| Muhammad Farrel Wibowo     | 13523153 | Implementasi code, testing |
