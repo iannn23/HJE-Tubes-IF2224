@@ -4,6 +4,7 @@ import io
 from lexer import Lexer
 from pascal_token import Token 
 from parser import Parser
+from semantic.analyzer import SemanticAnalyzer
 
 # KEYWORD Pascal-S
 PASCAL_S_KEYWORDS = [
@@ -55,6 +56,9 @@ def main():
         milestone_dir = os.path.dirname(os.path.dirname(input_path)) 
         
         test_number = "".join(filter(str.isdigit, input_filename))
+        # Fallback jika nama file tidak ada angkanya
+        if not test_number: test_number = "result"
+            
         output_filename = f"output-{test_number}.txt"
 
         output_dir = os.path.join(milestone_dir, "output")
@@ -99,6 +103,39 @@ def main():
                 
                 except Exception as e:
                     print(f"Gagal menulis file parse tree: {e}")
+
+                # 7. Inisialisasi dan Jalankan Semantic Analyzer
+                print("\nMemulai Analisis Semantik (Milestone 3)...")
+                
+                try:
+                    analyzer = SemanticAnalyzer()
+                    ast, symtab = analyzer.analyze(parse_tree)
+                    
+                    print("[SUKSES] Semantic Analysis Selesai! Struktur dan Tipe Data Valid.")
+                    
+                    # Output Symbol Table ke File
+                    symtab_filename = f"symboltable-{test_number}.txt"
+                    symtab_output_path = os.path.join(output_dir, symtab_filename)
+                    
+                    with open(symtab_output_path, 'w', encoding='utf-8') as f:
+                        f.write("SYMBOL TABLE (TAB)\n")
+                        f.write(f"{'Idx':<4} | {'ID':<15} | {'Obj':<4} | {'Type':<4} | {'Lev':<4} | {'Link':<4} | {'Adr':<4}\n")
+                        f.write("-" * 65 + "\n")
+                        for i, entry in enumerate(symtab.tab):
+                            if entry.get('id'):
+                                f.write(f"{i:<4} | {entry['id']:<15} | {entry['obj']:<4} | {entry['type']:<4} | {entry['lev']:<4} | {entry['link']:<4} | {entry['adr']:<4}\n")
+                        
+                        f.write("\n\nBLOCK TABLE (BTAB)\n")
+                        f.write(f"{'Idx':<4} | {'Last':<4} | {'Psze':<4} | {'Vsze':<4}\n")
+                        f.write("-" * 40 + "\n")
+                        for i, blk in enumerate(symtab.btab):
+                            f.write(f"{i:<4} | {blk['last']:<4} | {blk['psze']:<4} | {blk['vsze']:<4}\n")
+
+                    print(f"Symbol Table berhasil ditulis ke: {symtab_output_path}")
+
+                except Exception as e:
+                    print(f"\n[SEMANTIC ERROR] {e}")
+
             else:
                 print("Tidak ada output dari parser.")
 
