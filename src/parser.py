@@ -57,7 +57,7 @@ class Parser:
         if token and token.type == token_type and (value is None or token.value.lower() == value.lower()):
             self.advance()
             node_name = f"{token.type}({token.value})"
-            return Node(node_name)
+            return Node(node_name,value=token.value)
         
         expected_val = f" dengan nilai '{value}'" if value else ""
         current_val = f"'{self.current_token.value}' ({self.current_token.type})" if self.current_token else "None"

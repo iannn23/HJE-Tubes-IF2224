@@ -1,0 +1,43 @@
+=== SYMBOL TABLE (TAB) ===
+Idx  | ID              | Link | Obj        | Type | Ref  | Nrm  | Lev  | Adr 
+------------------------------------------------------------------------------
+29   | integer         | 0    | type       | 1    | 0    | 0    | 0    | 0   
+30   | real            | 0    | type       | 2    | 0    | 0    | 0    | 0   
+31   | boolean         | 0    | type       | 3    | 0    | 0    | 0    | 0   
+32   | char            | 0    | type       | 4    | 0    | 0    | 0    | 0   
+33   | HitungDasar     | 0    | program    | 0    | 0    | 0    | 0    | 0   
+34   | x               | 0    | variable   | 1    | 0    | 1    | 0    | 0   
+35   | y               | 34   | variable   | 1    | 0    | 1    | 0    | 1   
+36   | hasil           | 35   | variable   | 1    | 0    | 1    | 0    | 2   
+
+=== BLOCK TABLE (BTAB) ===
+Idx  | Last | Lpar | Psze | Vsze
+---------------------------------
+0    | 36   | 0    | 0    | 3   
+
+=== ARRAY TABLE (ATAB) ===
+(Kosong)
+
+=== DECORATED AST ===
+ProgramNode(name: 'HitungDasar')
+└── Block
+    ├── Declarations
+    │   ├── VarDecl('x') -> tab_index:34, type:integer, lev:0
+    │   ├── VarDecl('y') -> tab_index:35, type:integer, lev:0
+    │   └── VarDecl('hasil') -> tab_index:36, type:integer, lev:0
+    ├── Assign('x' := ...) -> type:integer
+    │   ├── target 'x' -> tab_index:34, type:integer
+    │   └── 10 -> type:integer
+    ├── Assign('y' := ...) -> type:integer
+    │   ├── target 'y' -> tab_index:35, type:integer
+    │   └── 5 -> type:integer
+    ├── Assign('hasil' := ...) -> type:integer
+    │   ├── target 'hasil' -> tab_index:36, type:integer
+    │   └── BinOp '+' -> type:integer
+    │       ├── target 'x' -> tab_index:34, type:integer
+    │       └── BinOp '*' -> type:integer
+    │           ├── target 'y' -> tab_index:35, type:integer
+    │           └── 2 -> type:integer
+    └── ProcedureCall(name: 'writeln')
+        ├── StringLiteral ''Hasil perhitungan = ''
+        └── target 'hasil'

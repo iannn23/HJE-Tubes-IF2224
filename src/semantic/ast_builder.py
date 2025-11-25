@@ -17,29 +17,41 @@ class ASTBuilder:
         
         # Bersihkan nama node dari < > untuk jadi nama method
         # Contoh: <program> -> visit_program
-        # Contoh: <if-statement> -> visit_if_statement
-        method_name = 'visit_' + node.name.replace('<', '').replace('>', '').replace('-', '_')
+        # Token: KEYWORD(program) -> visit_KEYWORD(program) -> tapi dihandle khusus di bawah
+        clean_name = node.name.replace('<', '').replace('>', '').replace('-', '_')
         
-        # Jika node adalah token leaf (seperti KEYWORD, IDENTIFIER, dll)
+        # Hapus bagian value dalam kurung jika ada, misal IDENTIFIER(x) -> IDENTIFIER
+        if '(' in clean_name:
+            clean_name = clean_name.split('(')[0]
+
+        method_name = 'visit_' + clean_name
+        
+        # Jika node adalah token leaf
         if method_name.startswith('visit_KEYWORD') or \
            method_name.startswith('visit_IDENTIFIER') or \
            method_name.startswith('visit_NUMBER') or \
            method_name.startswith('visit_STRING_LITERAL') or \
-           method_name.startswith('visit_CHAR_LITERAL'):
-            return node # Kembalikan node token aslinya (objek Node dari parser)
+           method_name.startswith('visit_CHAR_LITERAL') or \
+           method_name.startswith('visit_ASSIGN_OPERATOR') or \
+           method_name.startswith('visit_ARITHMETIC_OPERATOR') or \
+           method_name.startswith('visit_RELATIONAL_OPERATOR') or \
+           method_name.startswith('visit_LOGICAL_OPERATOR'):
+            return node # Kembalikan node token aslinya
 
         visitor = getattr(self, method_name, self.generic_visit)
         return visitor(node)
 
     def generic_visit(self, node):
-        raise Exception(f"No visit_{node.name} method")
+        # Skip untuk token/node yang tidak perlu di-visit (misal SEMICOLON, COLON)
+        return None
 
     # --- Program Structure ---
 
     def visit_program(self, node):
         # <program> -> <program-header> <declaration-part> <compound-statement> DOT
         header_node = node.children[0]
-        prog_name = header_node.children[1].value # Ambil value dari IDENTIFIER
+        # program-header -> KEYWORD IDENTIFIER SEMICOLON
+        prog_name = header_node.children[1].value 
         
         declarations = self.visit(node.children[1]) # visit_declaration_part
         compound_stmt = self.visit(node.children[2]) # visit_compound_statement
@@ -48,11 +60,8 @@ class ASTBuilder:
         return Program(prog_name, block)
 
     def visit_declaration_part(self, node):
-        # <declaration-part> -> kumpulan deklarasi
         declarations = []
         for child in node.children:
-            # Child bisa berupa <var-declaration>, <subprogram-declaration>, dll.
-            # Hasil visit bisa berupa single object atau list of objects
             result = self.visit(child)
             if result:
                 if isinstance(result, list):
@@ -63,57 +72,43 @@ class ASTBuilder:
 
     def visit_var_declaration(self, node):
         # <var-declaration> -> KEYWORD(variabel) <identifier-list> COLON <type> SEMICOLON ...
-        # Note: Satu baris "a, b: integer;" akan menghasilkan 2 objek VarDecl
         vars_list = []
         
-        # Karena struktur di parser bisa berulang (identifier list, colon, type, semicolon)
-        # Kita perlu iterasi children
-        i = 1 # Skip KEYWORD(variabel)
+        i = 1 
         while i < len(node.children):
-            id_list_node = node.children[i] # <identifier-list>
-            type_node = node.children[i+2]  # <type> (skip COLON)
+            id_list_node = node.children[i]
+            type_node = node.children[i+2]
             
-            # Ambil semua nama identifier
             identifiers = []
             for child in id_list_node.children:
                 if child.name.startswith("IDENTIFIER"):
                     identifiers.append(child)
             
-            # Ambil tipe data
-            # <type> -> KEYWORD(integer) atau lainnya
-            # Kita ambil token KEYWORD-nya
+            # Ambil token tipe dari child pertama <type>
             type_token = type_node.children[0] 
+            # Jika child pertama bukan token (misal <array-type>), logicnya perlu disesuaikan
+            # Untuk integer/real dasar, child[0] adalah KEYWORD(integer)
             
             for var_token in identifiers:
-                # Bungkus token tipe ke dalam objek Type AST
                 type_obj = Type(type_token)
-                # Bungkus variabel ke VarDecl
                 vars_list.append(VarDecl(Var(var_token), type_obj))
             
-            i += 4 # Lompat ke grup deklarasi berikutnya (jika ada)
+            i += 4 
             
         return vars_list
 
     def visit_subprogram_declaration(self, node):
-        # <subprogram-declaration> -> <procedure-declaration> | <function-declaration>
         return self.visit(node.children[0])
 
     def visit_procedure_declaration(self, node):
-        # KEYWORD(prosedur) ID [params] SEMI block SEMI
         proc_name = node.children[1].value
-        
         params = []
         idx = 2
-        # Cek jika ada parameter
         if node.children[idx].name == "<formal-parameter-list>":
             params = self.visit(node.children[idx])
             idx += 1
-            
-        idx += 1 # Skip SEMICOLON
         
-        # Deklarasi lokal dan body ada di children berikutnya
-        # Namun struktur parser.py memisahkan declaration_part dan compound_statement
-        # Kita gabungkan jadi Block
+        idx += 1 # SEMICOLON
         local_decls = self.visit(node.children[idx])
         body = self.visit(node.children[idx+1])
         block_node = Block(local_decls, body)
@@ -121,7 +116,6 @@ class ASTBuilder:
         return ProcedureDecl(proc_name, params, block_node)
 
     def visit_formal_parameter_list(self, node):
-        # Mengembalikan list of VarDecl
         params = []
         for child in node.children:
             if child.name == "<parameter-group>":
@@ -130,7 +124,6 @@ class ASTBuilder:
         return params
 
     def visit_parameter_group(self, node):
-        # Mirip var_declaration tapi untuk parameter
         id_list = node.children[0]
         type_node = node.children[2]
         type_token = type_node.children[0]
@@ -151,130 +144,141 @@ class ASTBuilder:
         return self.visit(stmt_list_node)
 
     def visit_statement_list(self, node):
-        # Mengembalikan objek Compound (list of statements)
         compound = Compound()
         for child in node.children:
-            if child.name == "<statement>":
-                stmt = self.visit(child)
-                if stmt:
-                    compound.children.append(stmt)
+            # --- PERBAIKAN UTAMA DI SINI ---
+            # Jangan cek child.name == "<statement>" karena Parser tidak membungkusnya
+            # Cukup abaikan SEMICOLON, sisanya adalah statement valid
+            if child.name.startswith("SEMICOLON"):
+                continue
+            
+            stmt = self.visit(child)
+            if stmt:
+                compound.children.append(stmt)
         return compound
 
     def visit_statement(self, node):
-        # <statement> hanya membungkus statement spesifik
+        # Jika ada node wrapper <statement>, ambil anaknya
         return self.visit(node.children[0])
 
     def visit_assignment_statement(self, node):
-        # ID := Expression
-        left_node = node.children[0] # IDENTIFIER
+        left_node = node.children[0]
         var_node = Var(left_node)
         
-        # Cek array access (belum diimplementasi di sini untuk penyederhanaan, bisa ditambahkan)
+        # Handle array access sederhana: ID [ expr ] := ...
+        # Cek anak kedua, jika LBRACKET berarti array access
+        op_idx = 1
+        if node.children[1].name.startswith("LBRACKET"):
+             # Logika array access (bisa dikembangkan)
+             op_idx = 4 # ID [ EXPR ] := (index ke-4 adalah ASSIGN)
         
-        op = node.children[1] # ASSIGN_OPERATOR
-        right_node = self.visit(node.children[2]) # <expression>
+        op = node.children[op_idx] 
+        right_node = self.visit(node.children[op_idx+1])
         
         return Assign(var_node, op, right_node)
 
     def visit_if_statement(self, node):
-        # JIKA expr MAKA stmt [SELAIN_ITU stmt]
         condition = self.visit(node.children[1])
         then_branch = self.visit(node.children[3])
         else_branch = None
-        
         if len(node.children) > 4:
-            # Ada ELSE
             else_branch = self.visit(node.children[5])
-            
         return If(condition, then_branch, else_branch)
 
     def visit_while_statement(self, node):
-        # SELAMA expr LAKUKAN stmt
         condition = self.visit(node.children[1])
         body = self.visit(node.children[3])
         return While(condition, body)
         
     def visit_procedure_call(self, node):
-        # ID ( [params] )
         proc_name = node.children[0].value
         params = []
-        if len(node.children) > 3: # Ada parameter list
-             params = self.visit(node.children[2]) # visit parameter_list
-        
-        # Token digunakan untuk tracking baris error nanti
+        if len(node.children) > 3: 
+             params = self.visit(node.children[2])
         token = node.children[0] 
         return ProcedureCall(proc_name, params, token)
 
     def visit_parameter_list(self, node):
-        # Mengembalikan list of expressions
         params = []
         for child in node.children:
             if child.name == "<expression>":
                 params.append(self.visit(child))
         return params
 
+    def visit_for_statement(self, node):
+        # UNTUK id := expr KE/TURUN_KE expr LAKUKAN stmt
+        var_node = Var(node.children[1]) # ID
+        start_expr = self.visit(node.children[3])
+        direction = node.children[4].value # KE / TURUN_KE
+        end_expr = self.visit(node.children[5])
+        body = self.visit(node.children[7])
+        
+        return For(var_node, start_expr, direction, end_expr, body)
+
     # --- Expressions ---
 
     def visit_expression(self, node):
-        # <expression> -> simple_expr [REL_OP simple_expr]
         left = self.visit(node.children[0])
-        
         if len(node.children) > 1:
-            op = node.children[1] # RELATIONAL_OPERATOR
+            op = node.children[1]
             right = self.visit(node.children[2])
             return BinOp(left, op, right)
-        
         return left
 
     def visit_simple_expression(self, node):
-        # <simple-expression> -> term (ADD_OP term)*
-        # Perlu menangani urutan operasi (flattening) atau chaining
-        # Untuk sederhananya kita asumsi struktur pohon biner kiri ke kanan
-        
-        # Cek unary operator di depan (opsional)
         first_term_idx = 0
-        # Logika unary bisa ditambahkan di sini jika ada di Parse Tree
+        # Cek unary operator (misal -5)
+        if node.children[0].name.startswith("ARITHMETIC_OPERATOR"):
+             # TODO: Implement UnaryOp Node jika perlu
+             # Untuk sekarang kita anggap term mulai dari index 1
+             # tapi logika parser mungkin berbeda.
+             # Kita ambil term pertama dulu:
+             if len(node.children) > 1:
+                 first_term_idx = 1
         
         left = self.visit(node.children[first_term_idx])
         
-        # Loop untuk sisa operation: op term op term...
         i = first_term_idx + 1
         while i < len(node.children):
             op = node.children[i]
             right = self.visit(node.children[i+1])
-            left = BinOp(left, op, right) # Build tree up
+            left = BinOp(left, op, right)
             i += 2
-            
         return left
 
     def visit_term(self, node):
-        # <term> -> factor (MUL_OP factor)*
         left = self.visit(node.children[0])
-        
         i = 1
         while i < len(node.children):
             op = node.children[i]
             right = self.visit(node.children[i+1])
             left = BinOp(left, op, right)
             i += 2
-            
         return left
 
     def visit_factor(self, node):
-        # <factor> -> ID | NUMBER | ( expr ) | ...
         child = node.children[0]
+        name = child.name
         
-        if child.name.startswith("NUMBER"):
+        if name.startswith("NUMBER"):
             return Num(child)
-        elif child.name.startswith("STRING_LITERAL"):
+        elif name.startswith("STRING_LITERAL"):
             return StringLiteral(child)
-        elif child.name.startswith("IDENTIFIER"):
+        elif name.startswith("CHAR_LITERAL"):
+            return StringLiteral(child) # Treat char as string for now
+        elif name.startswith("IDENTIFIER"):
             return Var(child)
-        elif child.name.startswith("LPARENTHESIS"):
-            # ( expression ) -> index 1 adalah expression
-            return self.visit(node.children[1])
-        elif child.name == "<function-call>":
-            # Belum dihandle penuh, anggap Var dulu atau implementasi FunctionCall
-            return Var(child.children[0]) # Simplified
+        elif name.startswith("KEYWORD") and (child.value == 'true' or child.value == 'false'):
+             # Boolean literal, bisa buat node khusus atau pakai Num/Var
+             return Num(child) # Simplified
+        elif name.startswith("LPARENTHESIS"):
+            return self.visit(node.children[1]) # ( expr )
+        elif name == "<function-call>":
+            # Handle function call
+            func_name = child.children[0].value
+            params = []
+            if len(child.children) > 3:
+                params = self.visit(child.children[2])
+            return FunctionCall(func_name, params, child.children[0])
             
         return None
