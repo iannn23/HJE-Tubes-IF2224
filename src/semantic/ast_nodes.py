@@ -25,11 +25,27 @@ class VarDecl(AST):
         self.var_node = var_node
         self.type_node = type_node
 
+class ConstDecl(AST):
+    def __init__(self, name, value, type_code):
+        super().__init__()
+        self.name = name
+        self.value = value
+        self.const_type = type_code      
+
+class TypeDecl(AST):
+    def __init__(self, name, type_obj):
+        super().__init__()
+        self.name = name
+        self.type_obj = type_obj
+
 class Type(AST):
     def __init__(self, token):
         super().__init__()
         self.token = token
         self.value = token.value  # misal: 'integer', 'real'
+        self.low = 0
+        self.high = 0
+        self.ele_type = None
 
 class ProcedureDecl(AST):
     def __init__(self, proc_name, params, block_node):
@@ -45,6 +61,12 @@ class FunctionDecl(AST):
         self.params = params
         self.return_type = return_type
         self.block_node = block_node
+
+class TypeDecl(AST):
+    def __init__(self, name, type_obj):
+        super().__init__()
+        self.name = name        
+        self.type_obj = type_obj 
 
 # --- Statement ---
 class Compound(AST):

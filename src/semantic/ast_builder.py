@@ -70,35 +70,142 @@ class ASTBuilder:
                     declarations.append(result)
         return declarations
 
-    def visit_var_declaration(self, node):
-        # <var-declaration> -> KEYWORD(variabel) <identifier-list> COLON <type> SEMICOLON ...
-        vars_list = []
+    def _extract_type_info(self, type_node):
+        """Helper untuk mengekstrak informasi tipe (termasuk array)."""
+        first_child = type_node.children[0]
         
+        # Tipe Dasar
+        if first_child.name.startswith("KEYWORD") and first_child.value in ['integer', 'real', 'boolean', 'char']:
+            return Type(first_child)
+            
+        # Tipe Array (Larik)
+        elif first_child.name.startswith("KEYWORD") and first_child.value in ['larik', 'array']:
+            range_node = type_node.children[2] # Node <range>
+            
+            # Ambil Node Expression dari Parse Tree
+            # Struktur: <range> -> <expression> .. <expression>
+            raw_low = range_node.children[0]
+            raw_high = range_node.children[2]
+            
+            # Visit untuk mendapatkan Node AST (bisa Num, Var, BinOp, dll)
+            low_ast = self.visit(raw_low)
+            high_ast = self.visit(raw_high)
+            
+            # Rekursif untuk tipe elemen
+            ele_type_node = type_node.children[5]
+            ele_type_obj = self._extract_type_info(ele_type_node)
+            
+            type_obj = Type(first_child)
+            
+            # SIMPAN AST NODE, BUKAN NILAI INT
+            type_obj.low_node = low_ast
+            type_obj.high_node = high_ast
+            
+            type_obj.ele_type = ele_type_obj
+            return type_obj
+            
+        # 3. Tipe Alias (Identifier)
+        elif first_child.name.startswith("IDENTIFIER"):
+            return Type(first_child)
+
+        return Type(first_child)
+
+    def visit_var_declaration(self, node):
+        vars_list = []
         i = 1 
         while i < len(node.children):
             id_list_node = node.children[i]
-            type_node = node.children[i+2]
+            type_node = node.children[i+2] # Node <type>
             
-            identifiers = []
-            for child in id_list_node.children:
-                if child.name.startswith("IDENTIFIER"):
-                    identifiers.append(child)
+            identifiers = [child for child in id_list_node.children if child.name.startswith("IDENTIFIER")]
             
-            # Ambil token tipe dari child pertama <type>
-            type_token = type_node.children[0] 
-            # Jika child pertama bukan token (misal <array-type>), logicnya perlu disesuaikan
-            # Untuk integer/real dasar, child[0] adalah KEYWORD(integer)
+            type_obj = self._extract_type_info(type_node)
             
             for var_token in identifiers:
-                type_obj = Type(type_token)
-                vars_list.append(VarDecl(Var(var_token), type_obj))
+                # copy type_obj agar setiap variabel punya instance sendiri
+                import copy
+                new_type = copy.copy(type_obj)
+                vars_list.append(VarDecl(Var(var_token), new_type))
             
             i += 4 
-            
         return vars_list
+    
+    def visit_const_declaration(self, node):
+        # <const-declaration> -> KONSTANTA ( ID = VALUE ; )+
+        consts_list = []
+        i = 1 # Mulai dari index 1 (setelah token KONSTANTA)
+        
+        while i < len(node.children):
+            id_node = node.children[i]      # Token IDENTIFIER
+            val_node = node.children[i+2]   # Token VALUE (Number/String/Char)
+            
+            name = id_node.value
+            raw_val = val_node.value
+            
+            # --- Logika Penentuan Tipe Konstanta ---
+            type_code = 0
+            val = raw_val
+            
+            if val_node.name.startswith("NUMBER"):
+                if '.' in str(raw_val):
+                    type_code = 2 # Real
+                    val = float(raw_val)
+                else:
+                    type_code = 1 # Integer
+                    val = int(raw_val)
+            
+            elif val_node.name.startswith("STRING_LITERAL"):
+                # Cek apakah String atau Char
+                s_val = str(raw_val).strip("'")
+                if len(s_val) == 1:
+                    type_code = 4 # Char
+                else:
+                    type_code = 5 # String
+                val = s_val
+            
+            elif val_node.name.startswith("CHAR_LITERAL"):
+                type_code = 4 # Char
+                val = str(raw_val).strip("'")
+            
+            elif val_node.name.startswith("KEYWORD"):
+                # Handle boolean literals (true/false)
+                if raw_val.lower() == 'true':
+                    type_code = 3 # Boolean
+                    val = True
+                elif raw_val.lower() == 'false':
+                    type_code = 3 # Boolean
+                    val = False
+                    
+            const_decl = ConstDecl(name, val, type_code)
+            consts_list.append(const_decl)
+            
+            # Loncat 4 langkah: ID -> = -> VAL -> ; -> (Next ID)
+            i += 4
+            
+        return consts_list
+    
+    def visit_type_declaration(self, node):
+        types = []
+        i = 1
+        
+        while i < len(node.children):
+            id_node = node.children[i]        
+            type_spec_node = node.children[i+2]
+            
+            name = id_node.value
+            type_obj = self._extract_type_info(type_spec_node) 
+            types.append(TypeDecl(name, type_obj))
+            
+            i += 4
+            
+        return types
 
     def visit_subprogram_declaration(self, node):
-        return self.visit(node.children[0])
+        child = node.children[0]
+        if child.name == "<procedure-declaration>":
+            return self.visit_procedure_declaration(child)
+        elif child.name == "<function-declaration>":
+            return self.visit_function_declaration(child) 
 
     def visit_procedure_declaration(self, node):
         proc_name = node.children[1].value
@@ -114,6 +221,29 @@ class ASTBuilder:
         block_node = Block(local_decls, body)
         
         return ProcedureDecl(proc_name, params, block_node)
+
+    def visit_function_declaration(self, node):
+        # <function-decl> -> FUNGSI ID (params) : TIPE ; BLOCK ;
+        func_name = node.children[1].value
+        
+        idx = 2
+        params = []
+        if node.children[idx].name == "<formal-parameter-list>":
+            params = self.visit(node.children[idx])
+            idx += 1
+        
+        idx += 1 
+        
+        return_type_node = node.children[idx]
+        return_type = self._extract_type_info(return_type_node) 
+        
+        idx += 2 
+        
+        local_decls = self.visit(node.children[idx])
+        body = self.visit(node.children[idx+1])
+        block_node = Block(local_decls, body)
+        
+        return FunctionDecl(func_name, params, return_type, block_node)
 
     def visit_formal_parameter_list(self, node):
         params = []

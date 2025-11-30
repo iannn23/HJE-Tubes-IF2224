@@ -46,7 +46,7 @@ class SymbolTable:
         })
         # Tidak update link/last karena program name biasanya spesial
 
-    def add_variable(self, name, type_code):
+    def add_variable(self, name, type_code, ref=0,  size=1):
         curr_block_idx = self.display[self.level]
         last_id = self.btab[curr_block_idx]["last"]
         
@@ -56,7 +56,7 @@ class SymbolTable:
         # obj=variable (1), nrm=1 (normal variable)
         entry = {
             "id": name, "obj": "variable", "type": type_code,
-            "ref": 0, "nrm": 1, "lev": self.level, 
+            "ref": ref, "nrm": 1, "lev": self.level, 
             "adr": current_adr, "link": last_id
         }
         self.tab.append(entry)
@@ -65,8 +65,73 @@ class SymbolTable:
         
         # Update Block Info
         self.btab[curr_block_idx]["last"] = new_idx
-        self.btab[curr_block_idx]["vsze"] += 1 # Asumsi ukuran 1 word
+        self.btab[curr_block_idx]["vsze"] += size
         
+        return new_idx
+    
+    def add_array_entry(self, xtyp, etyp, eref, low, high, elsz):
+        """
+        Menambahkan entri ke Array Table (atab).
+        Mengembalikan index (ref) ke entri tersebut.
+        """
+        # Hitung total size array: (high - low + 1) * element_size
+        size = (high - low + 1) * elsz
+        
+        entry = {
+            "xtyp": xtyp, # Tipe index 
+            "etyp": etyp, # Tipe elemen 
+            "eref": eref, # Ref jika elemennya array lain 
+            "low": low,   # Batas bawah
+            "high": high, # Batas atas
+            "elsz": elsz, # Ukuran satu elemen
+            "size": size  # Total ukuran array
+        }
+        self.atab.append(entry)
+        
+
+        return len(self.atab)
+    
+    def add_constant(self, name, type_code, value):
+        curr_block_idx = self.display[self.level]
+        last_id = self.btab[curr_block_idx]["last"]
+        
+        entry = {
+            "id": name, "obj": "constant", "type": type_code,
+            "ref": 0, "nrm": 0, "lev": self.level, 
+            "adr": value, # Nilai disimpan di adr
+            "link": last_id
+        }
+        self.tab.append(entry)
+        new_idx = len(self.tab) - 1
+        self.btab[curr_block_idx]["last"] = new_idx
+        return new_idx
+
+    def add_type(self, name, type_code, ref=0):
+        curr_block_idx = self.display[self.level]
+        last_id = self.btab[curr_block_idx]["last"]
+        
+        entry = {
+            "id": name, "obj": "type", "type": type_code,
+            "ref": ref, "nrm": 0, "lev": self.level, 
+            "adr": 0, "link": last_id
+        }
+        self.tab.append(entry)
+        new_idx = len(self.tab) - 1
+        self.btab[curr_block_idx]["last"] = new_idx
+        return new_idx
+
+    def add_function(self, name, return_type):
+        curr_block_idx = self.display[self.level]
+        last_id = self.btab[curr_block_idx]["last"]
+        
+        entry = {
+            "id": name, "obj": "function", "type": return_type,
+            "ref": 0, "nrm": 0, "lev": self.level,
+            "adr": 0, "link": last_id 
+        }
+        self.tab.append(entry)
+        new_idx = len(self.tab) - 1
+        self.btab[curr_block_idx]["last"] = new_idx
         return new_idx
 
     def add_procedure(self, name):
@@ -116,4 +181,10 @@ class SymbolTable:
                 entry['idx'] = i
                 return entry
                 
+        return None
+    
+    def get_array_info(self, ref_idx):
+        #Mengambil info array dari atab berdasarkan ref (1-based index)
+        if ref_idx > 0 and ref_idx <= len(self.atab):
+            return self.atab[ref_idx - 1] # Convert back to 0-based
         return None
